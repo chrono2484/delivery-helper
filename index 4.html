@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delivery Decision Helper</title>
+  <style>
+    :root {
+      --bg-light: #f7f7f7;
+      --text-light: #333;
+      --bg-dark: #121212;
+      --text-dark: #eee;
+      --accent: #ff6600;
+      --success: #27ae60;
+      --danger: #e74c3c;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 480px;
+      margin: auto;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.light-mode {
+      background-color: var(--bg-light);
+      color: var(--text-light);
+    }
+    body.dark-mode {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      font-size: 16px;
+      background-color: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      opacity: 0.95;
+    }
+    #result {
+      font-size: 20px;
+      text-align: center;
+      padding: 15px;
+      font-weight: bold;
+      margin-top: 10px;
+      border-radius: 6px;
+    }
+    .success {
+      background-color: var(--success);
+      color: white;
+    }
+    .danger {
+      background-color: var(--danger);
+      color: white;
+    }
+    .toggle-container {
+      text-align: right;
+      margin-top: 10px;
+    }
+    .toggle-container button {
+      background: none;
+      color: inherit;
+      font-size: 14px;
+      padding: 5px;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body class="light-mode">
+  <h2>🚗 Delivery Decision Helper</h2>
+  <label>Payout ($):</label>
+  <input type="number" id="payout" placeholder="e.g. 8.00" step="0.01">
+  <label>Distance (km):</label>
+  <input type="number" id="distance" placeholder="e.g. 3.5" step="0.1">
+  <label>Estimated Time (min):</label>
+  <input type="number" id="time" placeholder="e.g. 15" step="1">
+  <hr style="margin: 20px 0;">
+  <label>🔧 Minimum Payout ($):</label>
+  <input type="number" id="minPayout" value="7" step="0.1">
+  <label>🔧 Minimum $/km:</label>
+  <input type="number" id="minPerKm" value="2" step="0.1">
+  <label>🔧 Max Time (min):</label>
+  <input type="number" id="maxTime" value="15" step="1">
+  <button onclick="checkOrder()">Should I Accept?</button>
+  <div id="result"></div>
+  <div class="toggle-container">
+    <button onclick="toggleDarkMode()">🌗 Toggle Dark Mode</button>
+  </div>
+  <script>
+    function checkOrder() {
+      const payout = parseFloat(document.getElementById('payout').value);
+      const distance = parseFloat(document.getElementById('distance').value);
+      const time = parseInt(document.getElementById('time').value);
+      const minPayout = parseFloat(document.getElementById('minPayout').value);
+      const minPerKm = parseFloat(document.getElementById('minPerKm').value);
+      const maxTime = parseInt(document.getElementById('maxTime').value);
+      const resultDiv = document.getElementById('result');
+
+      if (isNaN(payout) || isNaN(distance) || isNaN(time)) {
+        resultDiv.textContent = "⚠️ Please fill in all fields.";
+        resultDiv.className = "danger";
+        return;
+      }
+
+      const perKm = payout / distance;
+      const meetsPayout = payout >= minPayout;
+      const meetsPerKm = perKm >= minPerKm;
+      const meetsTime = time <= maxTime;
+
+      if (meetsPayout && meetsPerKm && meetsTime) {
+        resultDiv.textContent = `✅ Accept — $${payout} for ${distance}km @ $${perKm.toFixed(2)}/km`;
+        resultDiv.className = "success";
+      } else {
+        resultDiv.textContent = `❌ Decline — $${payout} for ${distance}km @ $${perKm.toFixed(2)}/km`;
+        resultDiv.className = "danger";
+      }
+    }
+
+    function toggleDarkMode() {
+      const body = document.body;
+      body.classList.toggle('dark-mode');
+      body.classList.toggle('light-mode');
+    }
+  </script>
+</body>
+</html>
